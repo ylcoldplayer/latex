@@ -151,10 +151,10 @@ Brand Auction\\ % Your institution for the title page
 		\frametitle{Agenda}
 		
 
-				\pause
+				
 			\begin{enumerate}	
-				\item  \textbf{Bidding Products} \pause \\ 
-				\item  \textbf{Auto-Bidding Algorithm} \pause \\
+				\item  \textbf{Bidding Products}  \\ 
+				\item  \textbf{Auto-Bidding Algorithm}  \\
 				\item  \textbf{Cost Cap Bidding Algorithm}
 			\end{enumerate}
 
@@ -168,24 +168,24 @@ Brand Auction\\ % Your institution for the title page
 	
 	
 \begin{block}{Three Major Bidding Products} 
-	\pause
+	
 	\begin{enumerate}
 		\item \textbf{Max Delivery (a.k.a no bid, lowest cost)}
 		
 		\textit{Advertiser's input}: budget, no ROI requirements
 		
-		\pause 
+		 
 		\item \textbf{Cost Cap}
 		
 		\textit{Advertiser's input}: budget + cost cap (max CPX)
 		
-		\pause
+		
 		
 		\item \textbf{Manual bidding(other companies) }
 		
 		\textit{Advertiser's input}: budget + fixed bid price
 	\end{enumerate}
-\end{block} \pause
+\end{block} 
 
 
 \end{frame}
@@ -217,11 +217,11 @@ Brand Auction\\ % Your institution for the title page
 	
 	\begin{frame}
 		\frametitle{Auto Bidding Algorithm}
-		\pause 
+		 
 		\begin{block}{Optimal Bidding Formula} 
-			\pause
+			
 			Auction Mechanism: assume we use second price auction, then
-			\[ 	x_t = \mathbf{1}_{\left\{ \text{ecpm}_t > c_t \right\}} \quad \text{where} \quad \text{ecpm}_t = b_t * r_t\] \pause
+			\[ 	x_t = \mathbf{1}_{\left\{ \text{ecpm}_t > c_t \right\}} \quad \text{where} \quad \text{ecpm}_t = b_t * r_t\] 
 	
 	\textbf{Idea}:  use primal-dual + online gradient descent to derive an optimal bidding formula for auto-bidding campaigns 
 		\end{block}
@@ -234,7 +234,7 @@ Brand Auction\\ % Your institution for the title page
 		\frametitle{Auto Bidding Algorithm}
 
 		\begin{block}{Optimal Bidding Formula(cont'd)} 
-			\pause
+			
 			
 			\textbf{STEP 1: Write Lagrangian}
 			
@@ -298,7 +298,7 @@ Brand Auction\\ % Your institution for the title page
 		
 	\end{block}
 
-	\pause
+	
 
 	\begin{tcolorbox}[colframe=blue,colback=blue!5!white]
 		\begin{center}
@@ -321,7 +321,7 @@ Brand Auction\\ % Your institution for the title page
 		(From KKT condition) $b^*$ is the bid level that exactly depletes the budget, i.e.,
 		\[
 		\sum_{t=1}^{T} x_t c_t \leq B \implies \sum_{t=1}^{T} x_t c_t = B
-		\] \pause
+		\] 
 		
 		Assume $r_t, c_t$ are subject to i.i.d. at $(\tau, \tau + d\tau)$, the cost
 		\[
@@ -374,12 +374,12 @@ Brand Auction\\ % Your institution for the title page
 	\frametitle{Auto Bidding Algorithm}
 	
 	\begin{block}{How To Find Optimal Bid $b^*$ (cont'd)} 
-	Intuitively, do pacing by comparing actual cost to expected cost:  \pause 
+	Intuitively, do pacing by comparing actual cost to expected cost:   
 		\begin{itemize}
-			\item Ahead schedule      $\rightarrow$ lower bid \pause
-			\item Behind schedule  $\rightarrow$ increase bid \pause
-			\item Ahead schedule      $\rightarrow$ lower bid \pause
-			\item Behind schedule  $\rightarrow$ increase bid  \pause
+			\item Ahead schedule      $\rightarrow$ lower bid 
+			\item Behind schedule  $\rightarrow$ increase bid 
+			\item Ahead schedule      $\rightarrow$ lower bid 
+			\item Behind schedule  $\rightarrow$ increase bid  
 		\end{itemize}
 		
 		By following the curve: 
@@ -397,14 +397,14 @@ Brand Auction\\ % Your institution for the title page
 	
 	\begin{block}{Controller-based Algrorithm} 
 		\textbf{Approach 1: PID Controller}
-		\pause
+		
 		\begin{enumerate}
 		\item $e(t_{k}) = C_e(t_{k}) - C_a(t_{k})$
 		\\
-		\pause 
+		 
 		\item  $\phi(t_{k+1}) \leftarrow \lambda_P e(t_{k}) + \lambda_I \sum_{j=1}^{k} e(t_j) \Delta t_j + \lambda_D \frac{\Delta e(t_k)}{\Delta t_k}$
 		\\
-		\pause 
+		 
 		\item 
 		$b(t_{k+1}) \leftarrow b(t_k) \cdot \exp(\phi(t_{k+1}))$
 	\end{enumerate}
@@ -421,14 +421,14 @@ Brand Auction\\ % Your institution for the title page
 	\begin{block}{Controller-based Algrorithm(cont'd)} 
 	\textbf{Approach 2: MPC Controller}
 	
-	MPC optimizes the entire future spend, at time $t$, remaining budget $B_{t,r}$ \\  \pause  $\Rightarrow$ expected cost speed $cs_t$
-	\\ \pause  
+	MPC optimizes the entire future spend, at time $t$, remaining budget $B_{t,r}$ \\    $\Rightarrow$ expected cost speed $cs_t$
+	\\   
 	$\Rightarrow$ expected bid price $b_t$ 
 
 	\end{block}
 
 
-	\pause
+	
 
 	\begin{tcolorbox}[colframe=red,colback=blue!5!white]
 		\begin{center}
@@ -464,14 +464,14 @@ Brand Auction\\ % Your institution for the title page
 	\frametitle{Auto Bidding Algorithm}
 	
 	\begin{block}{iMPC Controller(cont'd)} 
-		At time, $t$, for a given cost speed $cs_t$, find corresponding bid price $b_t$ \pause \\
+		At time, $t$, for a given cost speed $cs_t$, find corresponding bid price $b_t$  \\
 		\text{} \\
 		
-		\textbf{iMPC algorithm:} \\  \pause
+		\textbf{iMPC algorithm:} \\  
 		
 			\begin{enumerate}	
-				\item fetch historical bid-cost pairs in past $N$ minutes \pause \\
-				\item  Choose longest increasing subsequence(LIS), then interpolate to get $f$ \pause \\
+				\item fetch historical bid-cost pairs in past $N$ minutes  \\
+				\item  Choose longest increasing subsequence(LIS), then interpolate to get $f$  \\
 				\item  $b_t = f^{-1}(cs_t)$
 			\end{enumerate}
 
@@ -486,11 +486,11 @@ Brand Auction\\ % Your institution for the title page
 	\frametitle{Auto Bidding Algorithm}
 	
 	\begin{block}{MPC Controller} 
-		LIS drawbacks: potentially throws away data points. \\ \pause
+		LIS drawbacks: potentially throws away data points. \\ 
 		
 		\text{ } \\
 		
-		\textbf{Q:} How to utilize all data to reduce noise while maintain monotonicity property of $f$?  \pause 
+		\textbf{Q:} How to utilize all data to reduce noise while maintain monotonicity property of $f$?   
 		
 		\textbf{Idea:} Use Isotonic Regression 
 	
@@ -550,11 +550,11 @@ Brand Auction\\ % Your institution for the title page
 		Use primal-dual method, similarly we get optimal bid:
 		\[
 		b^* = \frac{1 + \mu^* C}{\lambda^* + \mu^*} = \frac{\lambda^*}{\lambda^* + \mu^*} \cdot \frac{1}{\lambda^*} + \frac{\mu^*}{\lambda^* + \mu^*} \cdot C
-		\] \pause 
+		\]  
 		
 		\textit{Note: if $\mu^* = 0$, $b^* = \frac{1}{\lambda^*}$ which is equivalent to auto bidding} \\ 
 		
-		\pause
+		
 		 
 		In practice, we use the "cost-min" algorithm:
 		\[

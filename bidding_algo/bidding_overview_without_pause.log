@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  9 JUL 2024 13:23
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  9 JUL 2024 13:27
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**bidding_algo.tex
-(./bidding_algo.tex
+**bidding_overview_without_pause.tex
+(./bidding_overview_without_pause.tex
 LaTeX2e <2020-02-02> patch level 5
 L3 programming layer <2020-03-06>
 (/usr/local/texlive/2020/texmf-dist/tex/latex/beamer/beamer.cls
@@ -912,8 +912,8 @@ Package: xparse 2020-03-06 L3 Experimental document command parser
 \g__xparse_grabber_int=\count345
 \l__xparse_m_args_int=\count346
 \l__xparse_v_nesting_int=\count347
-))) (./bidding_algo.aux)
-\openout1 = `bidding_algo.aux'.
+))) (./bidding_overview_without_pause.aux)
+\openout1 = `bidding_overview_without_pause.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 137.
 LaTeX Font Info:    ... okay on input line 137.
@@ -1007,9 +1007,10 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 137.
 LaTeX Info: Redefining \pageref on input line 137.
 LaTeX Info: Redefining \nameref on input line 137.
- (./bidding_algo.out) (./bidding_algo.out)
+ (./bidding_overview_without_pause.out)
+(./bidding_overview_without_pause.out)
 \@outlinefile=\write8
-\openout8 = `bidding_algo.out'.
+\openout8 = `bidding_overview_without_pause.out'.
 
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
 (Font)                  OT1/cmr/m/n --> OT1/cmss/m/n on input line 137.
@@ -1089,25 +1090,11 @@ tionary-English.dict
 Dictionary: translator-theorem-dictionary, Language: English 
 )
 \c@lstlisting=\count355
- (./bidding_algo.nav) [1
+ (./bidding_overview_without_pause.nav) [1
 
 {/usr/local/texlive/2020/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2
 
 ] [3
-
-] [4
-
-] [5
-
-] [6
-
-] [7
-
-] [8
-
-] [9
-
-] [10
 
 ]
 LaTeX Font Info:    Trying to load font information for U+msa on input line 212
@@ -1128,45 +1115,33 @@ ut line 212.
 (/usr/local/texlive/2020/texmf-dist/tex/latex/sansmathaccent/ot1mathkerncmss.fd
 File: ot1mathkerncmss.fd 2020/01/31 Fontinst v1.933 font definitions for OT1/ma
 thkerncmss.
-) [11
+) [4
 
 ]
 
 LaTeX Font Warning: Font shape `OT1/cmss/b/n' undefined
 (Font)              using `OT1/cmss/m/n' instead on input line 229.
 
-[12
+[5
 
-] [13
+] [6
 
-] [14
+] [7
 
-] [15
+] [8
 
-] [16
-
-] [17
-
-] [18
-
-] [19
-
-] [20
-
-] [21
-
-] [22
+] [9
 
 ]
-<bidding_graphs.png, id=177, 867.24pt x 433.62pt>
+<bidding_graphs.png, id=96, 867.24pt x 433.62pt>
 File: bidding_graphs.png Graphic file (type png)
 <use bidding_graphs.png>
 Package pdftex.def Info: bidding_graphs.png  used on input line 347.
 (pdftex.def)             Requested size: 342.2953pt x 171.149pt.
- [23
+ [10
 
  <./bidding_graphs.png>]
-<flow_ratio_map.png, id=186, 722.7pt x 433.62pt>
+<flow_ratio_map.png, id=105, 722.7pt x 433.62pt>
 File: flow_ratio_map.png Graphic file (type png)
 <use flow_ratio_map.png>
 Package pdftex.def Info: flow_ratio_map.png  used on input line 366.
@@ -1175,39 +1150,16 @@ Package pdftex.def Info: flow_ratio_map.png  used on input line 366.
 Overfull \vbox (2.71228pt too high) detected at line 366
  []
 
-[24
+[11
 
- <./flow_ratio_map.png>] [25
+ <./flow_ratio_map.png>] [12
 
-] [26
+] [13
 
-] [27
-
-] [28
-
-] [29
-
-] [30
-
-] [31
-
-] [32
-
-] [33
+] [14
 
 ]
-[34
-
-] [35
-
-] [36
-
-] [37
-
-] [38
-
-]
-<bid_cost_pair.png, id=281, 578.16pt x 433.62pt>
+<bid_cost_pair.png, id=132, 578.16pt x 433.62pt>
 File: bid_cost_pair.png Graphic file (type png)
 <use bid_cost_pair.png>
 Package pdftex.def Info: bid_cost_pair.png  used on input line 457.
@@ -1216,56 +1168,42 @@ Package pdftex.def Info: bid_cost_pair.png  used on input line 457.
 Overfull \vbox (2.23514pt too high) detected at line 457
  []
 
-[39
+[15
 
- <./bid_cost_pair.png>] [40
+ <./bid_cost_pair.png>] [16
 
-] [41
-
-] [42
-
-] [43
-
-] [44
-
-] [45
-
-] [46
-
-] [47
+] [17
 
 ]
-<isotonic.png, id=339, 1094.0875pt x 563.10374pt>
+<isotonic.png, id=152, 1094.0875pt x 563.10374pt>
 File: isotonic.png Graphic file (type png)
 <use isotonic.png>
 Package pdftex.def Info: isotonic.png  used on input line 517.
 (pdftex.def)             Requested size: 342.2953pt x 176.1757pt.
- [48
+ [18
 
- <./isotonic.png>] [49
+ <./isotonic.png>] [19
 
-] [50
-
-] [51
-
-] [52
+] [20
 
 ]
 \tf@nav=\write9
-\openout9 = `bidding_algo.nav'.
+\openout9 = `bidding_overview_without_pause.nav'.
 
 \tf@toc=\write10
-\openout10 = `bidding_algo.toc'.
+\openout10 = `bidding_overview_without_pause.toc'.
 
 \tf@snm=\write11
-\openout11 = `bidding_algo.snm'.
+\openout11 = `bidding_overview_without_pause.snm'.
 
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 582.
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 582.
- (./bidding_algo.aux)
+
+(./bidding_overview_without_pause.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 582.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 582.
-Package rerunfilecheck Info: File `bidding_algo.out' has not changed.
+Package rerunfilecheck Info: File `bidding_overview_without_pause.out' has not 
+changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
 
 
@@ -1273,13 +1211,13 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 27491 strings out of 480608
- 569437 string characters out of 5903631
- 849462 words of memory out of 5000000
- 42696 multiletter control sequences out of 15000+600000
+ 27422 strings out of 480608
+ 569114 string characters out of 5903631
+ 849534 words of memory out of 5000000
+ 42691 multiletter control sequences out of 15000+600000
  542000 words of font info for 58 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 62i,15n,100p,779b,892s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 62i,15n,100p,797b,880s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb
 ></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb>
 </usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></
@@ -1293,10 +1231,10 @@ local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></usr
 local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/l
 ocal/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/loc
 al/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
-Output written on bidding_algo.pdf (52 pages, 472828 bytes).
+Output written on bidding_overview_without_pause.pdf (20 pages, 417138 bytes).
 PDF statistics:
- 441 PDF objects out of 1000 (max. 8388607)
- 349 compressed objects within 4 object streams
- 105 named destinations out of 1000 (max. 500000)
+ 228 PDF objects out of 1000 (max. 8388607)
+ 170 compressed objects within 2 object streams
+ 41 named destinations out of 1000 (max. 500000)
  99 words of extra memory for PDF output out of 10000 (max. 10000000)
 
