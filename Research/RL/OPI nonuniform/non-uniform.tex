@@ -1,0 +1,206 @@
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amscd}
+\usepackage[latin2]{inputenc}
+\usepackage{t1enc}
+\usepackage[mathscr]{eucal}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{graphics}
+\usepackage{pict2e}
+\usepackage{epic}
+\numberwithin{equation}{section}
+\usepackage[margin=2.9cm]{geometry}
+\usepackage{epstopdf} 
+
+ \def\numset#1{{\\mathbb #1}}
+
+ 
+
+\theoremstyle{plain}
+\newtheorem{Th}{Theorem}[section]
+\newtheorem{Lemma}[Th]{Lemma}
+\newtheorem{Cor}[Th]{Corollary}
+\newtheorem{Prop}[Th]{Proposition}
+\newtheorem{Assump}[Th]{Assumption}
+
+ \theoremstyle{definition}
+\newtheorem{Def}[Th]{Definition}
+\newtheorem{Conj}[Th]{Conjecture}
+\newtheorem{Rem}[Th]{Remark}
+\newtheorem{?}[Th]{Problem}
+\newtheorem{Ex}[Th]{Example}
+
+\newcommand{\im}{\operatorname{im}}
+\newcommand{\Hom}{{\rm{Hom}}}
+\newcommand{\diam}{{\rm{diam}}}
+\newcommand{\ovl}{\overline}
+%\newcommand{\M}{\mathbb{M}}
+
+\begin{document}
+
+\title[nonuniforme]{Notes on optimistic policy iteration with nonuniform distribution}
+
+
+\author[Y. Chen]{Yuanlong Chen}
+
+\address{University of Washington, Seattle} 
+
+\email{ylchen88@uw.edu}
+
+
+
+
+
+
+
+
+
+
+
+ %\subjclass[2010]{Primary: 05C??. Secondary: 05C??}
+
+
+
+ %\keywords{Optimistic Policy Iteration, Convergence, Stochastic Shortest Path} 
+
+
+
+%\begin{abstract}  
+%\end{abstract}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+In this short note, we try to extend the convergence result of optimistic policy iteration to a variant algorithm in which the initial states at each update step are selected subject to some nonuniform distribution. 
+
+\section{A postive result}
+We use the same notations as in \cite{Ts03} and consider Monte Carlo method. Suppose at each iteration $t$, we randomly pick state $i \in \{1, \dots , n\}$ with probability $p(i) > 0$, then generate a trajectory starting with $i$ and update the  cost-to-go function $J_t(i)$ accordingly. Then we have
+$$
+J_{t+1}(i)=\left\{
+\begin{array}{ll}
+(1-\gamma_t) J_t(i) + \gamma_t(J^{\mu_t} + \omega_t), \quad \text{with probability } p(i),  \\
+J_t(i), \qquad  \qquad \qquad \qquad  \qquad \quad \text{otherwise.}
+\end{array}
+\right.
+$$
+Follow the argument in \cite{Ts03}, we can rewrite the udpate rule as 
+$$
+J_{t+1}  = (1-\Gamma_t) J_t + \Gamma_t (J^{\mu_t} + v_t),
+$$
+where $\Gamma_t =\gamma_t\cdot D =  \gamma_t \cdot diag \{ p(1), \cdots, p(n)\}$ and $v_t$ is a random variable such that 
+$$
+E[v_t | \mathcal{F}_t]  = 0, \qquad E[\|v_t\|^2 | \mathcal{F}_t] \le A + B\|J_t\|^2,
+$$
+for some constants $A$ and $B$.
+
+Suppose $\alpha$ is the discounted factor, and set $\sigma $ as the condition number of $diag\{p(1), \cdots, p(n)\}$, i.e.
+$$
+\sigma = \frac{\max_{i} p(i)} {\min_{i} p(i)},
+$$
+then we have 
+\begin{Prop}
+	If $\sigma < \frac{1}{\alpha}$, $J_t \to J^*$ almost surely.
+\end{Prop}
+
+\begin{proof}[Sketch of the proof] 
+	As in the proof in \cite{Ts03}, set $X_t = TJ_t - J_t$ the key is to show that 
+	$$
+	\limsup_{t \to \infty} X_t \le 0.
+	$$
+	
+	Define $c_t = \|TJ_t - J_t\|_{\infty} = \max_{i} |TJ_t(i) - J_t(i)|$, we can show that 
+	$$
+	\|J^{\mu_t} - J_t\|_{\infty} \le \frac{c_t}{1-\alpha} e,
+	$$
+	where $e$ is a vector with all component equal to 1. Redo the calculation as in (2) in \cite{Ts03}, since $\Gamma_t$ do not commute with $P_{\mu_t}$, we have an extra commutator term $R_t $,
+	\begin{equation} \label{eq1}
+	TJ_{t+1} - J_{t+1} \leq (1-\Gamma_t) (TJ_t - J_t) + \Gamma_t R_t +  \Gamma_t \tilde{v}_t,
+	\end{equation}
+	where 
+	$$
+	R_t = \alpha \Gamma_t^{-1} [P_{\mu_t}, \Gamma_t] (J_t - J^{\mu_t}),
+	$$
+	and $\tilde{v}_t$ is a random variable such that 
+	$$
+	E[\tilde{v}_t | \mathcal{F}_t]  = 0, \qquad E[\|\tilde{v}_t\|^2 | \mathcal{F}_t] \le A + B\|J_t\|^2.
+	$$
+	
+	A straight foward calculation shows that 
+	$$
+	\Gamma_t^{-1}[P_{\mu_t}, \Gamma_t]  = \left(p^{\mu_t}_{i,j} \left(\frac{p(j)}{p(i)} - 1\right)\right),
+	$$
+	note that 
+	$$
+	\left|\frac{p(j)}{p(i)} - 1 \right| \le  \sigma - 1  < \frac{1}{\alpha} - 1 = \frac{1-\alpha }{\alpha},
+	$$
+	we then see that
+	$$
+	\begin{aligned}
+	|R_t(i)|& = \left| \alpha  \sum_{j= 1}^n p^{\mu_t}_{i,j} \left(\frac{p(j)}{p(i)} - 1\right) (J_t(j) - J^{\mu_t}(j)) \right| \\
+	& \le  \sum_{j= 1}^n p^{\mu_t}_{i,j} |\sigma -1|  \frac{\alpha }{1-\alpha} c_t  \\
+	& = \beta c_t.
+	\end{aligned}
+	$$
+	where $\beta = \frac{|\sigma-1| \cdot \alpha}{1-\alpha} < 1$.  Together with(\ref{eq1}), this implies
+	$$
+	X_{t+1} \leq (1-\Gamma_t) X_t + \Gamma_t (\beta \|X_t\|_{\infty} \cdot e) +  \Gamma_t \tilde{v}_t.
+	$$
+	Using the same argument in \cite{Ts03}, we can see that
+	$$
+	\limsup_{t \to \infty} X_t \le 0.
+	$$
+	The rest of proof is identical to \cite{Ts03}.
+\end{proof}
+
+
+\section{Optimality}
+\textbf{Question}: is the condition $\sigma < \frac{1}{\alpha}$ sharp? \\
+
+I am thinking about to investigate the dynamics of $TJ_t - J_t$ from the perspective of ODE approach.   Set $X_t = TJ_t - J_t$, i.e. 
+$$
+g_{\mu_t} + \alpha P_{\mu_t} J_t  - J_t= X_t.
+$$
+Since $\alpha P_{\mu_t} - I$ is invertible (its eigenvalues are no-zeros),  solving this matrix equation, we have 
+\begin{equation}\label{jt}
+J_t = (\alpha P_{\mu_t} - I)^{-1}X_t - (\alpha P_{\mu_t} - I)^{-1} g_{\mu_t}.
+\end{equation}
+On the other hand, note $J^{\mu_t}$ is the fixed point of $T_{\mu_t}$, i.e.
+$$
+g_{\mu_t} + \alpha P_{\mu_t} J^{\mu_t} = J^{\mu_t},
+$$
+we have 
+\begin{equation}\label{jmut}
+J^{\mu_t} = -(\alpha P_{\mu_t} - I)^{-1} g_{\mu_t}.
+\end{equation}
+From (\ref{jt}) and (\ref{jmut}), we see that
+$$
+J_t - J^{\mu_t} =  (\alpha P_{\mu_t} - I)^{-1}X_t
+$$
+Equation (\ref{eq1}) then, after some simplification, becomes
+\begin{equation}
+	X_{t+1} \le X_t + \gamma_t (H_t X_t +  \tilde{v}_t), 
+\end{equation}
+where 
+$$
+H_t = \alpha [ P_{\mu_t}, D](\alpha P_{\mu_t} - I)^{-1} - D. 
+$$
+
+If $H_t$ is negative definte no matter what policy $\mu_t$ is, the convergence result is easy to establish, but this might be true only under certain conditions(such as $\sigma < 1/\alpha$). For general non-uniform distribution, it's too much to hope this is still true.  Intuitively, $H_t$ should satisfy some other weaker properties, e.g., its eigenvalues have negative real part, however, when distribution is non-uniform, the trajactory of $X_t$ is curved and may cause the oscillation of policies. The convergence results are not easy to establish from this point of view.  But can we construct any counterexample to show that $\sigma < 1/\alpha$ is sharp? I am still thinking about it...
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{amsplain}
+\bibliography{ssp}
+
+\appendix
+\raggedbottom
+\sloppy
+
+\end{document}
