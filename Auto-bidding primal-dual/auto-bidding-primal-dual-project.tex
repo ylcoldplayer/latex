@@ -1,9 +1,11 @@
 \documentclass{beamer}
 \usepackage{amsmath}
 \usepackage{amsfonts}
+\usepackage{bbm}
+
 
 \title{Optimal Bidding Strategy for Auto Bidding Campaigns}
-\author{}
+\author{Yuanlong Chen}
 \date{}
 
 \begin{document}
@@ -24,22 +26,22 @@
 			\item $B$: Campaign budget
 			\item $T$: Total auction opportunities
 			\item $t$: $t^{\text{th}}$ auction opportunity
-			\item $I_t$: Indicator if the campaign wins the $t^{\text{th}}$ auction
-			\item $G$: Engagement cost of the $t^{\text{th}}$ auction
+			\item $x_t$: Indicator if the campaign wins the $t^{\text{th}}$ auction
+			\item $c_t$: Engagement cost of the $t^{\text{th}}$ auction
 			\item $b_t$: Bid price at $t$
-			\item $\theta$: Conversion rate at $t$
+			\item $r_t$: Conversion rate at $t$
 		\end{itemize}
 	\end{frame}
 	
 	\begin{frame}{Optimization Problem: CPC Campaign Example}
 		\begin{itemize}
-			\item \textbf{Objective}: Maximize expected engagement
+			\item \textbf{Objective}: Maximize expected engagement under Second Price Auction(SPA)
 			\[
-			\mathbb{E} \left[ \sum_t r_t I_t \right]
+			\max_{x_t \in  \{0, 1 \}}  \sum_{t=1}^T x_t r_t 
 			\]
 			\item \textbf{Constraint}: Stay within budget
 			\[
-			\sum_t b_t I_t \leq B
+			\sum_{t=1}^T x_t c_t \leq B \quad \text{where } x_t = \mathbbm{1}_{ \{b_t > c_t\} }
 			\]
 		\end{itemize}
 	\end{frame}
@@ -48,11 +50,11 @@
 		\begin{itemize}
 			\item Lagrangian:
 			\[
-			L = \sum_t r_t I_t - \lambda \left( \sum_t G_t - B \right)
+			\mathbf{L} = \sum_{t=1}^T x_t r_t - \lambda \left( \sum_{t=1}^T x_t c_t - B \right)
 			\]
 			\item Dual Problem:
 			\[
-			\min_{\lambda} \sum_t \left( r_t I_t - \lambda G_t \right) + \lambda B
+			\min_{\lambda \geq 0} \sum_{t=1}^T \left( r_t  - \lambda c_t \right)_{+} + \lambda B
 			\]
 		\end{itemize}
 	\end{frame}
@@ -61,19 +63,40 @@
 		\begin{itemize}
 			\item \textbf{Optimality Condition}:
 			\[
-			\sum_t I_t = \ldots
+			b_t^* = \frac{r_t}{\lambda^*}   \quad \text{where }  \lambda^* \text{ is the optimal dual param}
 			\]
-			\item \textbf{Solution via Online Gradient Descent (OGD)}:
+			\item \textbf{Bid Update via Dual Online Gradient Descent (DOGD)}:
 			\[
-			\text{Update Rule:} \quad \ldots
+			\lambda_{t+1} = \lambda_t - \epsilon_t \cdot \left( \frac{B}{T} - c_t \cdot \mathbbm{1}_{\{r_t \geq \lambda c_t\} }\right)
 			\]
 		\end{itemize}
 	\end{frame}
+
+
+	\begin{frame}{Extension to Cost Cap}
+		\begin{itemize}
+			\item \textbf{Problem Formulation}
+			\begin{align*}
+						& \max_{x_t \in  \{0, 1 \}}  \sum_{t=1}^T x_t r_t 
+						 \\  \text{ s.t. }  &  
+						 \\  &\sum_{t=1}^T x_t c_t \leq B \text{, } \sum_{t=1}^T x_t c_t \leq C \sum_{t=1}^T x_t r_t
+			\end{align*}
+			
+			
+			\item \textbf{Derive Bid Update Rule via DOGD as welll}
+		
+			
+		\end{itemize}
+		
+	\end{frame}
+	
 	
 	\begin{frame}{Alternative Solution: Model Predictive Control (MPC)}
 		\begin{itemize}
-			\item Uses MPC to solve the problem.
-			\item Sensitive to forecasting accuracy.
+			\item \textbf{Model Predictive Control}
+			\item \textbf{Dependent on Bid Landscape Forecasting} 
+			\item \textbf{Sensitive to forecasting accuracy}
+
 		\end{itemize}
 	\end{frame}
 	
@@ -81,7 +104,7 @@
 		\begin{itemize}
 			\item Baseline: PID controller
 			\item Treatment: OGD
-			\item \textbf{Result}: 10\% improvement in ROI metrics.
+			\item \textbf{Result}:  more than 10\% improvement in ROI metrics.
 		\end{itemize}
 	\end{frame}
 	
