@@ -1,0 +1,153 @@
+\documentclass[../main.tex]{subfiles}
+\usepackage{dsfont}
+\usepackage{amsmath}
+
+\begin{document}
+	\chapter{Bidding Problem Formulation}
+	
+	\intro{
+		In this chapter, we provide a rigorous mathematical formulation of two primary bidding problems, namely max delivery and cost cap, in the context of repeated auction settings. We then employ the primal-dual method to derive the optimal bidding formulas. These results serve as the foundation for designing online control algorithms, which will be explored in the subsequent chapters.
+	}
+	
+	\begin{section}{Max Delivery}
+	In the Max Delivery setting, advertisers set up a campaign with a specified budget $B$. The objective is to optimize the performance of the ad campaign while adhering to this budget constraint. Assuming this is a CPC (Cost-Per-Click) daily campaign and operates under the standard Second Price Auction framework, the Max Delivery problem can be formulated as the following optimization problem:
+	
+		\begin{equation}  \label{eq:max_delivery}
+			\begin{aligned}
+				\max_{x_t \in \{0,1\}} \quad & \sum_{t=1}^T x_t \cdot r_t \\
+				\text{s.t.} \quad &  \sum_{t=1}^{T} x_t \cdot c_t \leq B \\
+			\end{aligned}
+		\end{equation}
+	Here, \(T\) represents the total number of auction opportunities within a day. For the \(t\)-th auction:
+	\begin{itemize}
+		\item \(r_t\) is the predicted click-through rate (CTR).
+		\item \(c_t\) denotes the cost (in a second-price auction, this corresponds to the highest effective CPM [eCPM]).
+		\item \(x_t\) is a decision variable indicating whether we win the auction.
+	\end{itemize}
+	Under the rules of a second-price auction, \(x_t = 1\) if and only if our bid per impression exceeds the highest competing bid, mathematically expressed as:
+	\[
+	x_t = \mathds{1}_{ \{b_t > c_t \}}.
+	\]
+	We assume that both the sequences \(\{r_t\}\)  and \(\{c_t\}\) follows some unknown independent and identically distributed (\(i.i.d.\)) distribution, such as a log-normal distribution.
+	
+	
+	
+
+	
+	\subsection* {Optimal Solution to Max Delivery Problem}
+		\label{sec:md_optimal}
+		
+		It is challenging to solve this problem directly. Instead of addressing it in the primal space, we apply the primal-dual method to transform it into the dual space. The Lagrangian of~\eqref{eq:max_delivery} is given by:
+		\begin{equation*} \label{eq:max_delivery_dual}
+			\mathcal{L}(x, \lambda) = \sum_{t=1}^T x_t \cdot r_t  - \lambda \cdot \left( \sum_{t=1}^{T} x_t \cdot c_t  - B  \right)
+		\end{equation*}
+		The dual  is expressed as:
+		\begin{equation*}
+			\min_{\lambda \geq 0} \mathcal{L}^*(\lambda) = \min_{\lambda \geq 0} \max_{x_t \in \{0,1\}} \mathcal{L}(x, \lambda).
+		\end{equation*}
+		We can rewrite \(\mathcal{L}(x, \lambda)\) as:
+		\begin{equation*}
+			\mathcal{L}(x, \lambda) = \sum_{t=1}^T  x_t \cdot (r_t - \lambda c_t)  + \lambda B.
+		\end{equation*}
+		To maximize \(\mathcal{L}(x, \lambda)\), we set \(x_t = 1\) whenever \(r_t - \lambda c_t > 0\), and \(x_t = 0\) otherwise. Consequently, \(\mathcal{L}^*(\lambda) = \max_{x_t \in \{0,1\}} \mathcal{L}(x, \lambda)\) becomes:
+		\begin{equation*}
+			\mathcal{L}^*(\lambda) = \sum_{t=1}^{T} (r_t - \lambda c_t)_{+}  + \lambda B,
+		\end{equation*}
+		where \((z)_{+} = \mathds{1}_{ \{z>0\}} \cdot z\) is the ReLU function. Therefore, the dual problem is:
+		\begin{equation}
+			\min_{\lambda \geq 0}  \mathcal{L}^*(\lambda) = \min_{\lambda \geq 0}  \sum_{t=1}^{T} \left[ (r_t - \lambda c_t)_{+} + \lambda \cdot \frac{B}{T} \right].
+		\end{equation}
+	Suppose the problem is feasible and 
+	\[
+	\lambda^* = \argmin_{\lambda \geq 0} \mathcal{L}^*(\lambda)
+	\]
+	The KKT conditions indicate that $\lambda^*$ is the optimal dual variable that satisfies the budget constraint:
+	\[
+	\sum_{t=1}^{T} x_t \cdot c_t = B
+	\]
+	The optimal bid per impression is determined as: 
+	\begin{equation*}
+		b_t^* = \frac{r_t}{ \lambda^*}
+	\end{equation*}
+	The optimal bid per click is given by 
+	\begin{equation}
+		b^*_{click} = \frac{1}{\lambda^*}
+	\end{equation}
+
+
+	Quick summary of our main results
+	
+	\highlightbox{
+		The optimal bid per click for~\eqref{eq:max_delivery} in the stochastic setting is a constant bid:
+		\begin{equation*}
+			b_{click}^* = \frac{1}{\lambda^*}
+		\end{equation*}
+		Suppose supply is sufficient ($T$ big enough), the constant optimal bid  $b_{click}^*$ is the bid per click that exactly depletes the budget, it also suggests that the amount of budget depleted within a time interval is proportional to the number of auction opportunities, i.e.,
+		\[
+		\sum_{\tau \leq t \leq \tau + d\tau} x_t c_t \approx  \text{\# of auction opportunities in } (\tau, \tau + d\tau).
+		\]
+	}
+	\end{section}
+	
+	\begin{section}{Cost Cap}
+	Cost Cap is a product designed for price-sensitive advertisers. In addition to specifying a budget $B$, the advertiser defines a cost cap $C$, which sets an upper limit on the average cost per result. This ensures that the average cost per result does not exceed the specified cap. Using the notation from the previous section, the cost cap problem for a CPC daily campaign can be formulated as follows: 
+	\begin{equation}  \label{eq:cost_cap}
+		\begin{aligned}
+			\max_{x_t \in \{0,1\}} \quad & \sum_{t=1}^T x_t \cdot r_t \\
+			\text{s.t.} \quad &  \sum_{t=1}^{T} x_t \cdot c_t \leq B \\
+			& \frac{ \sum_{t=1}^{T} x_t \cdot c_t} { \sum_{t=1}^{T} x_t \cdot r_t } \leq C \\
+ 		\end{aligned}
+	\end{equation}
+	We make the same assumption that the sequences  \(\{r_t\}\)  and \(\{c_t\}\) follows some unknown \(i.i.d.\) distribution.
+	
+	\subsection* {Optimal Solution to Cost Cap Problem}
+	We apply the primal-dual method to solve~\eqref{eq:cost_cap}, as was done for the maximum delivery problem. The key difference is that we now have two constraints. The Lagrangian for this problem is given by:
+	\begin{equation*} 
+		\mathcal{L}(x, \lambda, \mu) = \sum_{t=1}^T x_t \cdot r_t  - \lambda \cdot \left( \sum_{t=1}^{T} x_t \cdot c_t  - B  \right) - \mu \cdot \left[ \sum_{t=1}^{T} x_t \cdot c_t - C \cdot \left(\sum_{t=1}^{T} x_t \cdot r_t \right) \right] 
+	\end{equation*}
+	The dual  is expressed as:
+	\begin{equation*}
+		\min_{\lambda \geq 0, \mu \geq 0} \mathcal{L}^*(\lambda, \mu) = \min_{\lambda \geq 0, \mu \geq 0} \max_{x_t \in \{0,1\}} \mathcal{L}(x, \lambda, \mu).
+	\end{equation*}
+	Note that \(\mathcal{L}(x, \lambda, \mu)\) can be rewritten as:
+	\begin{equation*}
+		\mathcal{L}(x, \lambda, \mu) = \sum_{t=1}^T  x_t \cdot (r_t - \lambda c_t - \mu c_t + \mu C r_t)  + \lambda B.
+	\end{equation*}
+	Similarly, to maximize \(\mathcal{L}(x, \lambda, \mu)\), we set \(x_t = 1\) whenever \(r_t - \lambda c_t - \mu c_t + \mu C r_t  > 0\), and \(x_t = 0\) otherwise. \(\mathcal{L}^*(\lambda, \mu) = \max_{x_t \in \{0,1\}} \mathcal{L}(x, \lambda, \mu)\) then becomes:
+	\begin{equation*}
+		\mathcal{L}^*(\lambda, \mu) = \sum_{t=1}^{T} (r_t - \lambda c_t - \mu c_t + \mu C r_t)_{+}  + \lambda B,
+	\end{equation*}
+	where $(\cdot)_{+}$ again is the ReLU function.  The dual problem of ~\eqref{eq:cost_cap} is:
+	\begin{equation}
+		\min_{\lambda \geq 0, \mu \geq 0}  \mathcal{L}^*(\lambda, \mu) = \min_{\lambda \geq 0, \mu \geq 0}  \sum_{t=1}^{T} \left[ (r_t - \lambda c_t - \mu c_t + \mu C r_t)_{+} + \lambda \cdot \frac{B}{T} \right].
+	\end{equation}
+	Suppose we have feasible solution to this problem 
+	\[
+	\lambda^*, \mu^* = \argmin_{\lambda \geq 0, \mu \geq 0} \mathcal{L}^*(\lambda, \mu)
+	\]
+	The optimal bid per impression is determined as: 
+	\begin{equation*}
+		b_t^* = \frac{1 + \mu^* C }{ \lambda^* + \mu^*} \cdot r_t
+	\end{equation*}
+	The optimal bid per click is given by 
+	\begin{equation}
+		b^*_{click} = \frac{1}{\lambda^* + \mu^*} + \frac{\mu^*}{\lambda^* + \mu^*} \cdot C =  \frac{\lambda^*}{\lambda^* + \mu^*} \cdot \frac{1}{\lambda^*}+ \frac{\mu^*}{\lambda^* + \mu^*} \cdot C
+	\end{equation}
+    Setting $\alpha = \lambda^*/(\lambda^* + \mu^*)$, we have 
+    \begin{equation}
+    	b^*_{click}  =  \alpha \cdot \frac{1}{\lambda^*}+ (1-\alpha) \cdot C
+    \end{equation}
+	Note that \(1 / \lambda^*\) is the optimal bid in max delivery without considering the cost constraint. Therefore, the optimal bid for the cost cap is simply a linear combination of the unconstrained max delivery bid and the cost cap bid.
+	
+		Quick summary of our main results for cost cap problem
+	
+	\highlightbox{
+		The optimal bid per click for cost cap problem ~\eqref{eq:cost_cap} in the stochastic setting is a constant, more specifically, simply a linear combination of the unconstrained max delivery bid and the cost cap bid:
+		\begin{equation*}
+		b^*_{click} = \alpha \cdot \frac{1}{\lambda^*}+  (1-\alpha)\cdot C
+		\end{equation*}
+	where $\alpha= \frac{\lambda^*}{\lambda^* + \mu^*} $.  
+	}
+	\end{section}
+	
+\end{document}

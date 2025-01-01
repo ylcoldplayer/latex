@@ -1,0 +1,71 @@
+\documentclass[../main.tex]{subfiles}
+
+
+\begin{document}
+	\chapter{Throttle-based Pacing}
+	
+	\intro{
+		In this chapter, we dicuss budget pacing algorithms via throttling. In the context of budget pacing, throttling refers to a mechanism that controls a campaign's participation in real-time auctions based on its actual budget spending relative to a target budget, which is determined by the supply pattern. This approach ensures that the ad campaign's budget is distributed in alignment with the supply pattern over its duration, thereby optimizing the campaign's performance.
+	}
+	
+\begin{section}{Probabilistic Throttling}
+	In throttle-based pacing, ad campaigns participate in online auctions with a fixed, pre-defined bid. We first consider a daily max-delivery campaign. If the fixed bid is set inappropriately and it's relatively high, it is highly likely that the campaign will win the majority of auction opportunities early on. As a result, the campaign may overspend at the start, rapidly exhausting the budget well before the end of the day. The probabilistic throttling algorithm is a mechanism used to control the participation of a campaign in real-time auctions based on its current spending relative to a target budget. The algorithm operates by dynamically adjusting a participation probability $p(t)$ that determines whether the campaign enters or skips a given auction. If the campaign is currently over-delivered (i.e., actual spending exceeds the expected spending), $p(t)$ is decreased, making it less likely to participate in the current auction, and vice versa when the campaign is under-delivered. This probabilistic control ensures that the campaign's budget is reasonably distributed over its time horizon while maximizing performance opportunities. 
+	
+	Modifications can be made to adapt this algorithm for a cost cap setting, where an additional performance constraint is imposed to ensure that the campaign achieves its goals within a specified cost threshold.
+	
+	\subsection*{Throttling for Max-Delivery Campaign}
+	From the discussion in \autoref{sec:md_optimal}, still assumming i.i.d. distributions of the conversion rates $\{r_t\}$ and costs $\{c_t\}$, we know that the optimal budget allocation is achieved when the budget for each duration is distributed proportionally to the total number of eligible auction opportunities (supply) available during that period. 
+	
+	Suppose the prediction model estimates there are \(T\) auction opportunities for this campaign within a day(in practice, \(T\) is typically derived by analyzing historical time series data, and the prediction accuracy of \(T\) at the campaign level may vary, which can degrade the performance of the pacing algorithm. Some online adjustments might be implemented to reduce the prediction noise; however, we will not discuss those techniques here. For simplicity, we assume the prediction is perfect). At the \(t\)-th auction, with a perfect pacing algorithm, the spend should be \(\alpha(t) = \frac{t}{T} \cdot B\), where \(B\) is the total budget. If the actual spend \(S(t) > \alpha(t)\), meaning pacing is ahead of schedule, we should slow down the pacing rate. An intuitive approach is to set a participation probability \(p(t)\), which determines the likelihood of the campaign participating in the \(t\)-th auction. In the case of over-delivery, we lower \(p(t)\) to reduce the chance of participating in the auction, thereby decreasing the likelihood of spending during this round. Mathematically, we can update \(p(t)\) by multiplying it by \(1 - \lambda_t\), where \(\lambda_t >0 \) is a control parameter to adjust the throttling level. Conversely, if the campaign is under-delivered, we increase \(p(t)\) by multiplying it by \(1 + \lambda_t \). Mathematically, the update rule of $p(t)$ can be expressed as follows: 
+	\[
+	p(t) =
+	\begin{cases} 
+		\min \left\{ p(t-1)\cdot (1 + \lambda_t), 1 \right\}& \text{if } S(t) \leq \alpha(t), \\
+		\max \left\{   p(t-1)\cdot (1 - \lambda_t), 0 \right\} & \text{if } S(t) > \alpha(t).
+	\end{cases}
+	\]
+	This motivates the following Algorithm~\ref{alg:throttling_pacing}:
+	
+		\begin{algorithm} 
+			\caption{Throttling-based Budget Pacing Algorithm}
+			\label{alg:throttling_pacing}
+			\begin{algorithmic}[1]
+				\Require $B$: Total budget of the campaign
+				\Require $T$: Total number of auction opportunities
+				\Require $t$: Current auction round
+				\Require $S(t)$: Spend so far at  $t$-th auction
+				\Require $p(t)$: Throttling probability at $t$-th auction
+				\Require $\{\lambda_t\}$: Control parameters for throttling adjustment
+				
+				\State Initialize $p(0) \gets 1.0$ and $S(0) \gets 0.0$
+				
+				\For{each auction at $t$-th auction}
+				\State Calculate target spend: $target\_spend \alpha(t) \gets \frac{t}{T} \times B$
+				\If{$S(t) \leq \alpha(t)$}
+				\State Increase throttling probability: $p(t) \gets \min \{ 1.0, p(t) \cdot (1 + \lambda_t \}$
+				\Else
+				\State Decrease throttling probability:  $p(t) \gets \max \{ 0.0 , p(t) \cdot (1 - \lambda_t \}$
+				\EndIf
+				
+				\State Generate a random number $r \in [0, 1]$
+				\If{$r \leq p(t)$}
+				\State Participate in the auction and get the spend in current auction $c_t$
+				\State Update spend: $S(t) \gets S(t-1) + c_t$
+				\Else
+				\State Skip the auction
+				\EndIf
+				\EndFor
+				
+			\end{algorithmic}
+		\end{algorithm}
+	In practice, to simplify the implementation, we may set \(\lambda_t\) as a constant, e.g. 10\%, as in \cite{LinkedInPacing}.  Also, there is no need to update $p(t)$ for every auction, we may set the update granularity to, say, 1 minute.  More technical implementation details could be found in \cite{LinkedInPacing}.  The regret analysis and the optimality of throttle-based pacing can be found in \cite{chen2024dynamic}, which also includes a comparison between throttle-based pacing and bid-based pacing, both of which we will introduce in the subsequent sections.
+
+
+\subsection*{Throttling for Cost Cap Campaign}
+More technical details on cost cap throttling \cite{xu2015smart}
+
+
+\end{section}
+	
+	
+\end{document}

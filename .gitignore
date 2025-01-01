@@ -1,1 +1,15 @@
 .DS_Store
+
+# latex 
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.lof
+*.log
+*.lot
+*.out
+*.ptc
+*.xml
+*.gz
+*.toc

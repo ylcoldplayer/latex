@@ -1,0 +1,53 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+	\chapter{PID Controller}
+	
+	\intro{
+		PID controller 
+	}
+	
+	
+	\begin{section}{Introduction to PID Controllers}
+	
+	A Proportional-Integral-Derivative (PID) controller is a widely used feedback control mechanism in industrial and engineering systems. It is designed to maintain a desired output by minimizing the error \(e(t)\), which is the difference between a desired setpoint \(r(t)\) and the measured process variable \(y(t)\). The PID controller achieves this by adjusting the control input \(u(t)\) based on three terms: proportional, integral, and derivative.
+	The primary motivation for using a PID controller is its ability to regulate dynamic systems efficiently by balancing fast response, minimal steady-state error, and robustness to disturbances. PID controllers are versatile and can be tuned to meet specific performance requirements in diverse applications, such as temperature control, motor speed regulation, and process automation.
+	
+	\subsection*{Mathematical Details}
+	The output of a PID controller, \(u(t)\), is given by:
+	
+	\[
+	u(t) = K_p e(t) + K_i \int_{0}^{t} e(\tau) \, d\tau + K_d \frac{d e(t)}{dt},
+	\]
+	
+	where:
+	\begin{itemize}
+		\item \(e(t) = r(t) - y(t)\) is the error signal,
+		\item \(K_p\) is the proportional gain, controlling the response proportional to the error,
+		\item \(K_i\) is the integral gain, reducing steady-state error by integrating the error over time,
+		\item \(K_d\) is the derivative gain, predicting future error by calculating the rate of change of the error.
+	\end{itemize}
+	
+	\subsection*{Components of a PID Controller}
+	\begin{enumerate}
+		\item \textbf{Proportional Term}: \(K_p e(t)\) provides an immediate response proportional to the current error. However, it may not fully eliminate the steady-state error.
+		\item \textbf{Integral Term}: \(K_i \int_{0}^{t} e(\tau) \, d\tau\) accumulates past errors, addressing steady-state error by applying corrective action based on the error history.
+		\item \textbf{Derivative Term}: \(K_d \frac{d e(t)}{dt}\) predicts future errors by responding to the rate of change of the error, improving stability and damping oscillations.
+	\end{enumerate}
+	PID controllers are simple to implement, robust, and effective for a wide range of systems. With proper tuning of \(K_p\), \(K_i\), and \(K_d\), they can balance speed, stability, and accuracy in dynamic environments.
+	\end{section}
+
+
+
+
+	\begin{section}{PID Contoller in Max Delivery}
+		PID controller approach: \cite{zhang2016feedback}
+		
+	\end{section}
+	
+	\begin{section}{PID Contoller in Cost Cap}
+		
+	\end{section}
+	
+	
+\end{document}

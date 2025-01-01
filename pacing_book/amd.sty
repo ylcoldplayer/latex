@@ -97,9 +97,24 @@
 \newcommand{\Z}{\mathcal Z}
 \newcommand{\ZZ}{\mathbb Z}
 
+
 % Functions 
 \newcommand{\expo}[1]{\exp{\left\{#1\right\}}}
 \newcommand{\lno}[1]{\ln{\left\{#1\right\}}}
+
+
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+
+
+
+% Define the custom command
+\newcommand{\highlightbox}[2][gray!10]{%
+	\centering
+	\begin{tcolorbox}[colback=#1, colframe=black, width=0.98\linewidth]
+		#2
+	\end{tcolorbox}%
+}
+
 
 %--------------------------------------------------------------------------
 % 		COLORS & LINKS
@@ -223,9 +238,11 @@
 % %--------------------------------------------------------------------------
 \RequirePackage[
 backend=biber,
-style = reading,
-sorting=ynt,
-citestyle=authortitle
+style = numeric,
+sorting=nyt,
+maxnames=99, % Or another sufficiently large number
+minnames=99,
+citestyle=numeric
 ]{biblatex}
 \addbibresource{References.bib}
 

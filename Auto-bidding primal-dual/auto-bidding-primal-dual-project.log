@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  28 OCT 2024 19:55
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  4 NOV 2024 09:14
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -918,7 +918,7 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 Here is how much of TeX's memory you used:
  17796 strings out of 480608
  341834 string characters out of 5903631
- 588166 words of memory out of 5000000
+ 589166 words of memory out of 5000000
  33231 multiletter control sequences out of 15000+600000
  539778 words of font info for 52 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -937,7 +937,7 @@ i8.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy1
 0.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.
 pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/symbols/msa
 m10.pfb>
-Output written on auto-bidding-primal-dual-project.pdf (9 pages, 122644 bytes).
+Output written on auto-bidding-primal-dual-project.pdf (9 pages, 122662 bytes).
 
 PDF statistics:
  304 PDF objects out of 1000 (max. 8388607)

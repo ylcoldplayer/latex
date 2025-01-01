@@ -2,6 +2,22 @@
 
 \begin{document}
 	\chapter*{Preface}
-	\lipsum
+	%\lipsum
+	 A typical real-time ad-serving funnel comprises ad targeting, conversion (e.g. click through rate) modeling, budget pacing (bidding), and auction processes. While there is a wealth of research and articles on ad targeting and conversion modeling, budget pacing—a crucial component—remains underexplored in existing literature. This book aims to provide engineers with a practical yet comprehensive introduction to budget pacing algorithms within the digital advertising domain. The book is structured as follows:
+	
+	In \autoref{part:some_basics}, we introduce foundational concepts in the digital advertising business, along with preliminary knowledge essential for understanding the subsequent chapters. We begin with a brief introduction to the history of digital advertising. Next, we cover some basics of programmatic ads, including the concepts of CPM, CPC, and CPA ads. The entire ad-serving funnel is then briefly discussed to illustrate how ads are served in real time. The pipeline presented focuses on first-party ads (e.g., ads on YouTube or Instagram), though the serving pipeline for DSPs is similar. Additionally, we address basic optimization techniques, auction mechanism design, and other related preliminary topics that will be referenced throughout the book. Readers already familiar with these subjects may choose to skip this section and proceed directly to \autoref{part:pacing_algorithms}.
+	
+	 
+	 In \autoref{part:pacing_algorithms}, we discuss various pacing methods under standard second price auction. Two main bidding products, max delivery and cost cap, are used as examples to demonstrate the concepts of these pacing methods. Nevertheless, the underlying principles introduced here are applicable to other problems as well. We first provide a rigorous mathematical formulation of both the max delivery and cost cap problems. In the subsequent sections, we discuss various pacing algorithms commonly adopted in the industry, including throttling, PID controllers, MPC controllers, online adaptive optimal control, and deep reinforcement learning. For each approach, we explain the motivation, introduce the basic background, and describe how it can be applied to bidding problems such as max delivery and cost cap. Additionally, we discuss the pros and cons of each approach, enabling readers to select the most suitable method for real-world applications based on their specific business needs. For some algorithms, pseudo-code and simple implementations are also provided to give readers a practical understanding of how to implement them in their daily work.
+	 
+	 In \autoref{part:misc}, we demonstrate how the pacing frameworks introduced in \autoref{part:pacing_algorithms} can be applied to various other business scenarios. Topics include the initialization of campaign bids, bidding under different auction mechanisms (e.g., first-price auctions, where bid shading is required), bid optimization for multi-constraint problems (e.g., campaigns delivered across different placements or channels such as first-party and third-party platforms, or campaign groups where multiple campaigns share the same budget), deep funnel conversion problems (e.g., bid optimization for post-conversion events such as retention), common brand advertisements with reach and frequency requirements, and the over-delivery problem.
+	 
+	 Budget optimization in digital advertising is a broad and complex topic. This little book primarily aims to provide engineers in the field with a comprehensive overview of the landscape of budget pacing algorithms. It does not attempt to cover every detail of budget pacing. For better readability, we omit some theoretical aspects, such as regret analysis and equilibrium analysis. Readers interested in these topics are encouraged to refer to the academic papers mentioned throughout the book for more in-depth information.
+	 
+	 \begin{flushright}
+	 	\textit{Y. Chen}
+	 \end{flushright}
+	 
+	
 	
 \end{document}

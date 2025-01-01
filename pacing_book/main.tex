@@ -11,6 +11,12 @@
 \setlength{\parindent}{0.5cm} % Idk
 \input{theorems.tex} % Theorems styles and colors
 \usepackage[english]{babel} %Language
+\usepackage{amssymb}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\usepackage{hyperref}
+
 
 \setlist[itemize]{itemsep=5pt} % Adjust the length as needed
 \setlist[enumerate]{itemsep=5pt} % Adjust the length as needed
@@ -26,17 +32,15 @@
 % %--------------------------------------------------------------------------
 % %         General Informations
 % %--------------------------------------------------------------------------
-\newcommand{\BigTitle}{
-	A MATHEMATICAL TEMPLATE
-}
+\newcommand{\BigTitle}{A Pratical Guide to Budget Pacing Algorithms in Digital Advertising}
 
 \newcommand{\LittleTitle}{
-	For Mathematical Peoples
+	For Engineers
 }
+\title{My Document Title}
 
 
 \begin{document}
-	
 	% %--------------------------------------------------------------------------
 	% %         First pages 
 	% %--------------------------------------------------------------------------
@@ -49,27 +53,46 @@
 	% %--------------------------------------------------------------------------
 	% %         Core of the document 
 	% %--------------------------------------------------------------------------
-	\part{First part}
-	\subfile{files/0.0.testchap}
-	\subfile{files/0.0.testchap}
-	\subfile{files/0.0.testchap}
+	\part{Some Basics} 
+	\label{part:some_basics}
+	\subfile{files/1.1.briefhistory}
+	\subfile{files/1.2.adsbasics}
+	\subfile{files/1.3.biddingproducts}
+	\subfile{files/1.4.optimization}
+	\subfile{files/1.5.auction}
+	\subfile{files/1.6.experiments}
 	
-	\part{Second part}
-	\subfile{files/0.0.testchap}
-	\subfile{files/0.0.testchap}
-	\subfile{files/0.0.testchap}
+	\part{Pacing Algorithms}
+	\label{part:pacing_algorithms}
+	\subfile{files/2.1.formulation}
+	\subfile{files/2.2.throttle}
+	\subfile{files/2.3.pid}
+	\subfile{files/2.4.mpc}
+	\subfile{files/2.5.dogd}
+	\subfile{files/2.6.drl}
+
 	
-	\part{Third part}
-	\subfile{files/0.0.testchap}
-	\subfile{files/0.0.testchap}
-	\subfile{files/0.0.testchap}
+	\part{Miscellaneous}
+	\label{part:misc}
+	\subfile{files/3.1.initbid}
+	\subfile{files/3.2.bidshading}
+	\subfile{files/3.3.multichannel}
+	\subfile{files/3.4.campaigngroup}
+	\subfile{files/3.5.deepconversion}
+	\subfile{files/3.6.reach}
+	\subfile{files/3.7.overdelivery}
+	
+	
 	
 	
 	
 	% %--------------------------------------------------------------------------
 	% %         Bibliographie 
 	% %--------------------------------------------------------------------------
-	\nocite{*} % to cite evey things, else cite each on using : \cite{ifrs17}. 
+	%\nocite{*} % to cite evey things, else cite each on using : \cite{ifrs17}. 
+	%\addcontentsline{toc}{section}{References}
 	\printbibliography %to print bibliographie
+
+	
 	
 \end{document}
