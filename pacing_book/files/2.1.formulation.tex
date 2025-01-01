@@ -9,8 +9,9 @@
 		In this chapter, we provide a rigorous mathematical formulation of two primary bidding problems, namely max delivery and cost cap, in the context of repeated auction settings. We then employ the primal-dual method to derive the optimal bidding formulas. These results serve as the foundation for designing online control algorithms, which will be explored in the subsequent chapters.
 	}
 	
-	\begin{section}{Max Delivery}
-	In the Max Delivery setting, advertisers set up a campaign with a specified budget $B$. The objective is to optimize the performance of the ad campaign while adhering to this budget constraint. Assuming this is a CPC (Cost-Per-Click) daily campaign and operates under the standard Second Price Auction framework, the Max Delivery problem can be formulated as the following optimization problem:
+	\begin{section}{Max Delivery} \label{sec:md_optimal}
+	In the Max Delivery setting, advertisers set up a campaign with a specified budget \(B\). The objective is to optimize the performance of the ad campaign while adhering to this budget constraint. Assuming this is a CPC (Cost-Per-Click) daily campaign operating under the standard Second Price Auction framework, a common goal is to maximize the total clicks for the campaign. Thus, the Max Delivery problem can be formulated as the following optimization problem:
+	
 	
 		\begin{equation}  \label{eq:max_delivery}
 			\begin{aligned}
@@ -35,7 +36,6 @@
 
 	
 	\subsection* {Optimal Solution to Max Delivery Problem}
-		\label{sec:md_optimal}
 		
 		It is challenging to solve this problem directly. Instead of addressing it in the primal space, we apply the primal-dual method to transform it into the dual space. The Lagrangian of~\eqref{eq:max_delivery} is given by:
 		\begin{equation*} \label{eq:max_delivery_dual}
@@ -61,7 +61,7 @@
 	\[
 	\lambda^* = \argmin_{\lambda \geq 0} \mathcal{L}^*(\lambda)
 	\]
-	The KKT conditions indicate that $\lambda^*$ is the optimal dual variable that satisfies the budget constraint:
+	The KKT conditions indicate that if $\lambda^* > 0$ is the optimal dual variable, budget constraint must satisfy the following:
 	\[
 	\sum_{t=1}^{T} x_t \cdot c_t = B
 	\]
@@ -84,7 +84,7 @@
 		\end{equation*}
 		Suppose supply is sufficient ($T$ big enough), the constant optimal bid  $b_{click}^*$ is the bid per click that exactly depletes the budget, it also suggests that the amount of budget depleted within a time interval is proportional to the number of auction opportunities, i.e.,
 		\[
-		\sum_{\tau \leq t \leq \tau + d\tau} x_t c_t \approx  \text{\# of auction opportunities in } (\tau, \tau + d\tau).
+		\sum_{\tau \leq t \leq \tau + d\tau} x_t c_t \propto  \text{\# of auction opportunities in } (\tau, \tau + d\tau).
 		\]
 	}
 	\end{section}

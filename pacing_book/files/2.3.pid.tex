@@ -41,11 +41,157 @@
 
 
 	\begin{section}{PID Contoller in Max Delivery}
-		PID controller approach: \cite{zhang2016feedback}
+		\subsection*{Main Algorithm}
+		In \autoref{sec:md_optimal}, we mentioned that, optimally, the amount of budget depleted within a time interval should be proportional to the number of auction opportunities during that time interval, i.e.,
+
+		\[
+		\sum_{\tau \leq t \leq \tau + d\tau} x_t c_t \propto \text{\# of auction opportunities in } (\tau, \tau + d\tau).
+		\]
 		
+		Remember that the optimal bid is the bid that just depletes the campaign's budget, assuming there is abundant supply. In practice, we can first construct the target spend per interval and use this target spend as the setpoint to apply the PID controller discussed above.Suppose we have a CPC campaign with a daily budget of \$100. We choose $d\tau =$ 15 minutes as the time interval and obtain the predicted number of eligible requests (auction opportunities) for these intervals from the prediction model, as shown in \autoref{fig:flow_ratio_15min}.
+		
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.99\textwidth]{../Images/flow_ratio_15min.png}
+			\caption{Supply Pattern (Number of Eligible Requests Per 15 Minutes)}
+			\label{fig:flow_ratio_15min}
+		\end{figure}
+		
+		Based on the supply pattern in \autoref{fig:flow_ratio_15min}, we can construct the target spend per 15-minute interval for this campaign. For simplicity, within each target spend interval $d\tau$, we assume the budget is consumed linearly over time. Suppose \(TS(t)\) is the target spend in the \(t\)-th interval, \(NR(t)\) is the number of eligible requests in the \(t\)-th interval, \(B = 100\) is the total daily budget, and \(T = 96\) is the number of target spend intervals. The proportional budget allocation rule per interval is given by:
+			\[
+				TS(t) = \frac{NR(t)}{\sum_{s=1}^{T} NR(s)} \cdot B
+			\]
+			
+		The per-interval target spend is then computed and plotted in \autoref{fig:target_spend_15min}:
+		
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.99\textwidth]{../Images/target_spend_15min.png}
+			\caption{Target Spend Per 15 Minutes}
+			\label{fig:target_spend_15min}
+		\end{figure}
+	
+	We summarize the budget allocation algorithm as follows:
+	
+		\begin{algorithm}[H]
+		\caption{Compute Target Budget per Interval}
+		\begin{algorithmic}[1]
+			\Require $B$: Total daily budget
+			\Require $NR(t)$: Number of eligible requests in interval $t$
+			\Require $T$: Total number of intervals in a day
+			\State Initialize $TS(t) \gets 0$ for all $t = 1, \dots, T$
+			\State Compute the total eligible requests:
+			\[
+			\text{TotalRequests} \gets \sum_{t=1}^{T} NR(t)
+			\]
+			\For{$t = 1$ to $T$}
+			\State Compute the proportional share of the budget for interval $t$:
+			\[
+			TS(t) \gets \frac{NR(t)}{\text{TotalRequests}} \cdot B
+			\]
+			\EndFor
+			\State \Return $TS(t)$ for all $t = 1, \dots, T$
+		\end{algorithmic}
+	\end{algorithm}
+	
+		Suppose the bid price gets updated every \(\Delta t\) time (\(\Delta t\) is the tunable pacing update interval, which we may set to, e.g., 1 minute) at \(t_0, t_1, t_2, \cdots, t_N\), where \(N = \text{OneDay} / \Delta t\). We define the error factor and control signal as:
+		
+		\[
+		\begin{aligned}
+			e(t_k) &= r_{t_k} - s(t_k), \\
+			u(t_{k}) &\gets K_p e(t_k) + K_i \sum_{j=1}^{k} e(t_j) \Delta t + K_d \frac{\Delta e(t_k)}{\Delta t},
+		\end{aligned}
+		\]
+		
+		where:
+		\begin{itemize}
+			\item \(r_{t_k}\): Observed spend during the \(k\)-th pacing update interval,
+			\item \(s(t_k)\): Target spend derived by proportionally allocating within the target budget interval \(d\tau\) that contains it, e.g., if \([t_{k-1}, t_k]\) lies within the \(t\)-th target budget interval, then 
+			\[
+			s(t_k) = \frac{\Delta t}{d\tau} \cdot TS(t),
+			\]
+			where \(TS(t)\) is the target spend for the \(t\)-th interval.
+			
+		\end{itemize}
+		
+		The bid can be updated by leveraging an actuator that takes the current control signal \(u(t_k)\) to adjust the current bid price \(b(t_k)\) as:
+		
+		\[
+		b(t_{k+1}) \gets b(t_k) \exp\{u(t_{k})\}.
+		\]
+		
+		The PID algorithm for max delivery problem is summarized in \autoref{alg:pid_md}. For more in-depth knowledge on applying PID controllers to the max delivery pacing problem, one may refer to  \cite{wang2017display} and \cite{zhang2016feedback}.
+		
+		\begin{algorithm}
+			\caption{PID Controller for Bid Price Modulation in Max Delivery}
+			\label{alg:pid_md}
+			\begin{algorithmic}[1]
+				\Require $\Delta t$: Time interval for updates
+				\Require $T$: Total campaign duration
+				\Require $B$: Total campaign budget
+				\Require $\{ TS(t) \}$: Target spend for each target budget interval $t$
+				\Require $K_p, K_i, K_d$: PID controller gains
+				\State Initialize $b(0) \gets \text{initial\_bid\_price}$
+				\State Initialize $u(0) \gets 0$
+				\State Initialize $\text{cumulative\_error} \gets 0$
+				\State Initialize $\text{previous\_error} \gets 0$
+				
+				\For{$k = 1$ to $N$} \Comment{$N = \text{OneDay} / \Delta t$}
+				\State Find the $t$-th target budget interval that contains $t_k$ update interval, compute:
+				\[
+				s(t_k) \gets \frac{\Delta t}{d\tau} \cdot TS(t)
+				\]
+				\State Measure observed spend during the interval:
+				\[
+				r(t_k) \gets \text{observed\_spend}(t_k)
+				\]
+				\State Compute the error factor:
+				\[
+				e(t_k) \gets r(t_k) - s(t_k)
+				\]
+				\State Update the control signal using the PID formula:
+				\[
+				u(t_k) \gets K_p \cdot e(t_k) + K_i \cdot \text{cumulative\_error} + K_d \cdot \frac{e(t_k) - \text{previous\_error}}{\Delta t}
+				\]
+				\State Update the cumulative error:
+				\[
+				\text{cumulative\_error} \gets \text{cumulative\_error} + e(t_k) \cdot \Delta t
+				\]
+				\State Update the bid price:
+				\[
+				b(t_k) \gets b(t_{k-1}) \cdot \exp(u(t_k))
+				\]
+				\State Update the previous error:
+				\[
+				\text{previous\_error} \gets e(t_k)
+				\]
+				\State Actuate the new bid price:
+				\[
+				\text{submit\_bid}(b(t_k))
+				\]
+				\EndFor
+			\end{algorithmic}
+		\end{algorithm}
+		
+		\subsection*{Bidding Dynamics}
+		We show here the detailed bidding dynamics for this campaign. \autoref{fig:flow_ratio_map} is a simplified plot demonstrating how the PID controller operates in a real-world dynamic environment. 
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.99\textwidth]{../Images/flow_ratio_map.png}
+			\caption{Target Spend vs Actual Spend Over Time}
+			\label{fig:flow_ratio_map}
+		\end{figure}
+	The dynamics of a PID controller adjusts bids based on the relationship between the \textbf{target spend} (black line) and the \textbf{actual spend} (red line) over time. Target spend represents the ideal cumulative budget spending at any point in time to evenly distribute the budget. Actual spend reflects the real cumulative spend achieved by the campaign over time.  The graph highlights two key conditions: being \textbf{ahead of the schedule} or \textbf{behind the schedule}, and how these conditions affect bid modulation.
+	
+	If the delivery is behind the schedule, i.e. when the actual spend (red line) is below the target spend (black line), the campaign is under-delivering. The PID controller \textbf{increases the bid} to catch up with the target spend. Higher bids make the campaign more competitive in auctions, increasing the likelihood of winning more impressions and spending more. In the plot, the actual spend curve slopes upward more steeply after the "increase bid" label in the "behind" regions; If the delivery is ahead of the schedule, i.e. when the actual spend (red line) exceeds the target spend (black line), the campaign is over-delivering. The PID controller \textbf{lowers the bid} to slow down the spending rate and realign with the target spend. Lower bids reduce the competitiveness of the campaign in auctions, resulting in fewer impressions and slower spend. In the plot, the actual spend curve becomes less steep after the "lower bid" label in the "ahead" regions.
+	
+	This feedback mechanism ensures a balanced distribution of the budget over time, optimizing performance while adhering to pacing constraints.
+	
 	\end{section}
 	
+	
 	\begin{section}{PID Contoller in Cost Cap}
+		cost-min paper: \cite{kitts2017ad}
 		
 	\end{section}
 	
