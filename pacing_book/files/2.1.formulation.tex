@@ -73,9 +73,9 @@
 	\begin{equation}
 		b^*_{click} = \frac{1}{\lambda^*}
 	\end{equation}
+	Under the assumption that \(r_t\) and \(c_t\) are subject to some unknown i.i.d. distribution, the budget spend of the campaign within a time slot \(\Delta \tau\) should be proportional to the number of impressions served during that time slot. For more technical details, one may refer to \cite{lee2013real} and \cite{wang2017display}.
 
-
-	Quick summary of our main results
+	\textbf{\\Quick summary of our main results}
 	
 	\highlightbox{
 		The optimal bid per click for~\eqref{eq:max_delivery} in the stochastic setting is a constant bid:
@@ -84,7 +84,7 @@
 		\end{equation*}
 		Suppose supply is sufficient ($T$ big enough), the constant optimal bid  $b_{click}^*$ is the bid per click that exactly depletes the budget, it also suggests that the amount of budget depleted within a time interval is proportional to the number of auction opportunities, i.e.,
 		\[
-		\sum_{\tau \leq t \leq \tau + d\tau} x_t c_t \propto  \text{\# of auction opportunities in } (\tau, \tau + d\tau).
+		\sum_{\tau \leq t \leq \tau + \Delta \tau} x_t c_t \propto  \text{\# of auction opportunities in } (\tau, \tau + \Delta \tau).
 		\]
 	}
 	\end{section}
@@ -139,7 +139,7 @@
     \end{equation}
 	Note that \(1 / \lambda^*\) is the optimal bid in max delivery without considering the cost constraint. Therefore, the optimal bid for the cost cap is simply a linear combination of the unconstrained max delivery bid and the cost cap bid.
 	
-		Quick summary of our main results for cost cap problem
+	\textbf{\\Quick summary of our main results}
 	
 	\highlightbox{
 		The optimal bid per click for cost cap problem ~\eqref{eq:cost_cap} in the stochastic setting is a constant, more specifically, simply a linear combination of the unconstrained max delivery bid and the cost cap bid:
