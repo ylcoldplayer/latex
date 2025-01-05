@@ -8,7 +8,128 @@
 	}
 	
 	\begin{section}{Max Delivery}
-		ref:  \cite{balseiro2020dual} \cite{balseiro2019learning} \cite{gao2022bidding}
+	\subsection*{Main Algorithm}
+	The intuition behind controller-based approaches introduced in previous sections is to tweak the bid of a campaign by comparing the current delivery status to the target delivery schedule. This is based on the fact that the optimal budget consumption rate should be proportional to the distributional density of eligible auction opportunities for the campaign. We can take another perspective by directly solving this problem in the dual space. The key observation is as follows:
+	
+	Recall that the optimal bid per impression is given by:
+	\[
+	b_t^{*} = \frac{r_t}{\lambda^*}.
+	\]
+	Therefore, to find \(b_t^{*}\), it is sufficient to determine \(\lambda^*\). Note that the dual problem is given by \autoref{eq:max_delivery_dual}:
+	\[
+	\min_{\lambda \geq 0}  \mathcal{L}^*(\lambda) = \min_{\lambda \geq 0}  \sum_{t=1}^{T} \left[ (r_t - \lambda c_t)_{+} + \lambda \cdot \frac{B}{T} \right].
+	\]
+	Denoting \((r_t - \lambda c_t)_{+} + \lambda \cdot \frac{B}{T}\) by \(f_t(\lambda)\), we have:
+	\[
+	\min_{\lambda \geq 0}  \sum_{t=1}^{T} f_t(\lambda).
+	\]
+	Readers who are familiar with optimization should recognize that this is a standard one-dimensional convex optimization problem. As auction requests arrive online in a streaming manner, it can naturally be solved using the Stochastic Gradient Descent (SGD) method. The update rule for \(\lambda\) is given by:
+	\[
+	\lambda_t \gets \lambda_t - \epsilon_t \cdot \nabla_{\lambda} f_t(\lambda) = \lambda_t - \epsilon_t \cdot \left( \frac{B}{T} - \mathds{1}_{ \{r_t > \lambda_t c_t \}} \cdot c_t \right),
+	\]
+	where \(\epsilon_t\) is the step size(learning rate), \(\mathds{1}_{\{r_t > \lambda_t c_t\}}\) is the indicator function, and \(c_t\) is the highest competing bid per impression in the market. Note that \(\mathds{1}_{ \{r_t > \lambda_t c_t \}} \cdot c_t\) represents the observed spend in the \(t\)-th auction, while \(B/T\) is the expected spend per auction. The gradient thus quantifies the deviation from the expected spend. The bid at the \(t\)-th auction round is:
+	\[
+	b_t = \frac{r_t}{\lambda_t}.
+	\]
+	
+	The discussion above highlights the core idea of the \textbf{D}ual \textbf{O}nline \textbf{G}radient \textbf{D}escent (\textbf{DOGD}) algorithm for the max delivery problem, which we summarize in \autoref{alg:dogd_md}:
+	
+	
+	
+	\begin{algorithm}[H]
+		\caption{\textbf{D}ual \textbf{O}nline \textbf{G}radient \textbf{D}escent(\textbf{DOGD}) for Max Delivery}
+		\label{alg:dogd_md}
+		\begin{algorithmic}[1]
+			\Require $B$: Total budget, $T$:  Predicted total number of auction opportunities, $\epsilon_t$: Step size schedule
+			%\Require $r_t$: pCTR, $c_t$: highest competing eCPM in auction $t$
+			%\Ensure Optimal bids $b_t$ for each auction $t$
+			
+			\State Initialize $\lambda_0 \gets \lambda_{\text{init}}$ \Comment{Initial dual variable}
+			
+			\For{all incoming auction requests indexed by $t$} \Comment{Iterate over auction rounds}
+			\State Observe  $r_t$: pCTR, $c_t$: highest competing eCPM in auction $t$
+			\State Compute the gradient of $f_t(\lambda)$:
+			\[
+			\nabla_{\lambda} f_t(\lambda) = \frac{B}{T} - \mathds{1}_{ \{r_t > \lambda_t c_t\}} \cdot c_t
+			\]
+			\State Update $\lambda_t$ using SGD:
+			\[
+			\lambda_t \gets \lambda_t - \epsilon_t \cdot \nabla_{\lambda} f_t(\lambda)
+			\]
+			\State Compute the bid per impression for the $t$-th auction:
+			\[
+			b_t \gets \frac{r_t}{\lambda_t}
+			\]
+			\State Submit $b_t$ for auction $t$
+			\EndFor
+		\end{algorithmic}
+	\end{algorithm}
+	
+	As we discussed before, instead of updating bids for every auction, it is more common to update bids in a batch manner. Suppose the update interval is \(\Delta t\) and \(R(t)\) is the number of observed auction requests within this interval. The mini-batch gradient within \(\Delta t\) is given by:
+	\[
+	\sum_{s \in (t, t+\Delta t)} \nabla_{\lambda} f_s(\lambda) = \sum_{s \in (t, t+\Delta t)} \left( \frac{B}{T} - \mathds{1}_{ \{r_s > \lambda_s c_s\}} \cdot c_s \right) = \frac{R(t)}{T} \cdot B - \sum_{s \in (t, t+\Delta t)} \mathds{1}_{ \{r_s > \lambda_s c_s\}} \cdot c_s.
+	\]
+	Note that \(\sum_{s \in (t, t+\Delta t)} \mathds{1}_{ \{r_s > \lambda_s c_s\}} \cdot c_s\) represents the actual spend during \(\Delta t\), which we denote as \(S(t)\). The mini-batch gradient can then be written as:
+	\[
+	\sum_{s \in (t, t+\Delta t)} \nabla_{\lambda} f_s(\lambda) = \frac{R(t)}{T} \cdot B - S(t).
+	\]
+	The mini-batch update rule is given by:
+	\[
+	\lambda_t \gets \lambda_t - \epsilon_t \cdot \left( \frac{R(t)}{T} \cdot B - S(t) \right).
+	\]
+	The bid per click remains unchanged within \((t, t+\Delta t)\) and is given by:
+	\[
+	b_{\text{click}, t} = \frac{1}{\lambda_t}
+	\]
+	For each auction request \(s \in (t, t+\Delta t)\), the bid per impression is computed as:
+	\[
+	b_s = b_{\text{click}, t} \cdot r_s = \frac{r_s}{\lambda_t}
+	\]
+
+	
+	We summarize this Mini-Batch DOGD algorithm in \autoref{alg:dogd_md_batch}:
+
+	\begin{algorithm}[H]
+		\caption{Mini-Batch DOGD for Max Delivery Problem}
+		\label{alg:dogd_md_batch}
+		\begin{algorithmic}[1]
+			\Require $B$: Total budget, $T$: Predicted total number of auction opportunities, $\Delta t$: Mini-batch update interval, $\epsilon_t$: Step size schedule
+			%\Require $r_s$: Revenue per impression, $c_s$: Cost per impression
+			\Ensure Optimal dual variable $\lambda_t$ and corresponding bids per impression $b_s$
+			
+			\State Initialize $\lambda_0 \gets \lambda_{\text{init}}$ \Comment{Initial dual variable}
+			
+			\For{$t = 0$ to \texttt{EndOfDay} with step size $\Delta t$} \Comment{Iterate over mini-batches}
+			\State Count the number of auction requests \(R(t)\) and observe the actual spend $S(t)$ during interval \((t, t+\Delta t)\)
+			
+			\State Compute the mini-batch gradient:
+			\[
+			\text{BatchGrad}_t = \sum_{ s \in (t, t+\Delta t)} \nabla_{\lambda} f_s(\lambda) = \frac{R(t)}{T} \cdot B - S(t)
+			\]
+			\State Update the dual variable using the mini-batch gradient:
+			\[
+			\lambda_t \gets \lambda_t - \epsilon_t \cdot \text{BatchGrad}_t 
+			\]
+			\State Compute the bid per click for all auctions in \((t, t+\Delta t)\):
+			\[
+			b_{click, t} = \frac{1}{\lambda_t}
+			\]
+			\State Compute bid per impression $b_s$ for all $s \in (t, t+\Delta t)$ with pCTR $r_s$:
+			\[
+			b_s = b_{click, t} \cdot r_s
+			\]
+			\EndFor
+		
+		\end{algorithmic}
+	\end{algorithm}
+	
+	
+	For more technical details about the DOGD algorithm (e.g., regret analysis and implementations), one may refer to \cite{balseiro2020dual}, \cite{balseiro2019learning}, and \cite{gao2022bidding}.
+
+	
+	\subsection*{Practical Considerations} 
+	
+	
 	\end{section}
 
 	\begin{section}{Cost Cap}

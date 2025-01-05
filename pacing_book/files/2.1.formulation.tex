@@ -38,7 +38,7 @@
 	\subsection* {Optimal Solution to Max Delivery Problem}
 		
 		It is challenging to solve this problem directly. Instead of addressing it in the primal space, we apply the primal-dual method to transform it into the dual space. The Lagrangian of~\eqref{eq:max_delivery} is given by:
-		\begin{equation*} \label{eq:max_delivery_dual}
+		\begin{equation*}
 			\mathcal{L}(x, \lambda) = \sum_{t=1}^T x_t \cdot r_t  - \lambda \cdot \left( \sum_{t=1}^{T} x_t \cdot c_t  - B  \right)
 		\end{equation*}
 		The dual  is expressed as:
@@ -54,7 +54,7 @@
 			\mathcal{L}^*(\lambda) = \sum_{t=1}^{T} (r_t - \lambda c_t)_{+}  + \lambda B,
 		\end{equation*}
 		where \((z)_{+} = \mathds{1}_{ \{z>0\}} \cdot z\) is the ReLU function. Therefore, the dual problem is:
-		\begin{equation}
+		\begin{equation} \label{eq:max_delivery_dual}
 			\min_{\lambda \geq 0}  \mathcal{L}^*(\lambda) = \min_{\lambda \geq 0}  \sum_{t=1}^{T} \left[ (r_t - \lambda c_t)_{+} + \lambda \cdot \frac{B}{T} \right].
 		\end{equation}
 	Suppose the problem is feasible and 
@@ -73,7 +73,11 @@
 	\begin{equation}
 		b^*_{click} = \frac{1}{\lambda^*}
 	\end{equation}
-	Under the assumption that \(r_t\) and \(c_t\) are subject to some unknown i.i.d. distribution, the budget spend of the campaign within a time slot \(\Delta \tau\) should be proportional to the number of impressions served during that time slot. For more technical details, one may refer to \cite{lee2013real} and \cite{wang2017display}.
+	As the optimal bid is constant, under the assumption that \(r_t\) and \(c_t\) are subject to some unknown i.i.d. distribution, the expected cost for each eligible auction opportunity \( \mathbb{E} \left[x_t \cdot c_t \right]\) in this campaign should also be constant. Therefore, the budget spend of the campaign within a time slot \(\Delta \tau\) should be proportional to the number of eligible auction opportunities served during that time slot.,i.e.,
+	\[
+	\sum_{\tau \leq t \leq \tau + \Delta \tau} x_t c_t \propto  \text{\# of auction opportunities in } (\tau, \tau + \Delta \tau).
+	\]
+	For more technical details, one may refer to \cite{lee2013real} and \cite{wang2017display}.
 
 	\textbf{\\Quick summary of our main results}
 	
@@ -137,7 +141,8 @@
     \begin{equation}
     	b^*_{click}  =  \alpha \cdot \frac{1}{\lambda^*}+ (1-\alpha) \cdot C
     \end{equation}
-	Note that \(1 / \lambda^*\) is the optimal bid in max delivery without considering the cost constraint. Therefore, the optimal bid for the cost cap is simply a linear combination of the unconstrained max delivery bid and the cost cap bid.
+	Note that \(1 / \lambda^*\) is the optimal bid in max delivery without considering the cost constraint. Therefore, the optimal bid for the cost cap is simply a linear combination of the unconstrained max delivery bid and the cost cap bid. When \(\alpha \to 1\) (i.e., \(\mu^* \to 0\)), the cost constraint becomes invalid, and \(b^*_{\text{click}} \to 1 / \lambda^*\), reducing the problem to the max delivery problem. Conversely, when \(\alpha \to 0\) (i.e., \(\mu^* \to \infty\)), the budget constraint becomes invalid, and \(b^* \to C\), meaning the campaign will bid at the maximum level allowed under the cost constraint, i.e., the cost cap.
+	
 	
 	\textbf{\\Quick summary of our main results}
 	
