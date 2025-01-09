@@ -124,16 +124,162 @@
 	\end{algorithm}
 	
 	
-	For more technical details about the DOGD algorithm (e.g., regret analysis and implementations), one may refer to \cite{balseiro2020dual}, \cite{balseiro2019learning}, and \cite{gao2022bidding}.
-
+	Some remarks on the DOGD algorithm: The optimization is performed at the campaign level. Interestingly, under certain regularity conditions, this campaign-level optimization leads to a marketplace Nash equilibrium. Furthermore, regret analysis can be conducted to demonstrate that this algorithm is theoretically optimal. For more technical details, one may refer to \cite{balseiro2020dual}, \cite{balseiro2019learning}, and \cite{gao2022bidding}.
+	
 	
 	\subsection*{Practical Considerations} 
-	
+		Someome practical considerations for implementing the DOGD algorithm for max delivery in real-world production sytem:
+	\begin{itemize}
+		\item $\lambda$ initialization \\
+		More details will be discussed in next part \autoref{init}
+		\item Normalization 
+			\begin{itemize}
+				\item  Normalization of update rule
+				\item  Normalization of $\lambda$ 
+			\end{itemize}
+		\item Target Ratio Choice 
+		\item Mirror Gradient Descent 
+	\end{itemize}
 	
 	\end{section}
 
 	\begin{section}{Cost Cap}
-		 \cite{gao2022bidding}
+		\subsection*{Main Algorithm}
+		The Cost Cap problem can also be solved using the DOGD algorithm. Recall that the optimal bid per click for the cost cap is given by \autoref{eq:cost_cap_bid_formula}:
+		\begin{equation*}
+			b^*_{\text{click}} = \frac{\lambda^*}{\lambda^* + \mu^*} \cdot \frac{1}{\lambda^*} + \frac{\mu^*}{\lambda^* + \mu^*} \cdot C,
+		\end{equation*}
+		where \(\lambda^*\) and \(\mu^*\) are the dual variables. 
+		
+		Similar to the method discussed in the Max Delivery problem in the previous section, solving this problem reduces to determining the dual variables \(\lambda^*\) and \(\mu^*\). The dual problem of the cost cap is given by \autoref{eq:cost_cap_dual}:
+		\begin{equation*}
+			\min_{\lambda \geq 0, \mu \geq 0} \mathcal{L}^*(\lambda, \mu) = \min_{\lambda \geq 0, \mu \geq 0} \sum_{t=1}^{T} \left[ \big(r_t - \lambda c_t - \mu c_t + \mu C r_t\big)_{+} + \lambda \cdot \frac{B}{T} \right].
+		\end{equation*}
+		Define the per-time step loss function as:
+		\[
+		f_t(\lambda, \mu) = \big(r_t - \lambda c_t - \mu c_t + \mu C r_t\big)_{+} + \lambda \cdot \frac{B}{T}.
+		\]
+		The dual problem can then be rewritten as:
+		\[
+		\min_{\lambda \geq 0, \mu \geq 0} \mathcal{L}^*(\lambda, \mu) = \min_{\lambda \geq 0, \mu \geq 0} \sum_{t=1}^{T} f_t(\lambda, \mu).
+		\]
+		Using stochastic gradient descent (SGD), the update rules for \(\lambda\) and \(\mu\) are:
+		\begin{equation*}
+			\begin{aligned}
+				\lambda_{t+1} &  \gets  \lambda_t - \epsilon_t \cdot \nabla_\lambda f_t(\lambda, \mu)= \lambda_t - \epsilon_t \cdot \left( \frac{B}{T} - c_t \cdot \mathds{1}_{\{r_t - \lambda c_t - \mu c_t + \mu C r_t > 0\}} \right), \\
+				\mu_{t+1} & \gets  \mu_t - \epsilon_t \cdot \nabla_\mu f_t(\lambda, \mu)=  \mu_t - \epsilon_t \cdot \big(C r_t - c_t\big) \cdot \mathds{1}_{\{r_t - \lambda c_t - \mu c_t + \mu C r_t > 0\}},
+			\end{aligned}
+		\end{equation*}
+		where \(\epsilon_t\) is the learning rate, and \(\mathds{1}_{\{\cdot\}}\) is the indicator function. If we examine the update rules more closely, \(c_t / r_t\) represents the actual cost per click in the sense of expectation. From this, we can observe that the gradients of \(\lambda\) and \(\mu\) quantify the deviations from the target spend and the target cost per click (CPC), respectively. 
+		
+		
+		\begin{algorithm}[H]
+			\caption{Dual Online Gradient Descent (DOGD) for Cost Cap}
+			\label{alg:dogd_cost_cap}
+			\begin{algorithmic}[1]
+				\Require $B$: Total budget, $C$: Target cost per click (CPC), $T$: Predicted total number of auction opportunities, $\epsilon_t$: Step size schedule
+				\Ensure Bid values for auctions
+				\State Initialize $\lambda_0 \gets \lambda_{\text{init}}, \mu_0 \gets \mu_{\text{init}}$ \Comment{Initial dual variables}
+				\For{all incoming auction requests indexed by $t$}
+				\State Observe $r_t$: predicted click-through rate (pCTR), $c_t$: highest competing eCPM in auction $t$
+				\State Compute the gradient of $f_t(\lambda, \mu)$:
+				\[
+				\nabla_\lambda f_t(\lambda, \mu) \gets \frac{B}{T} - c_t \cdot \mathds{1}_{\{r_t - \lambda c_t - \mu c_t + \mu C r_t > 0\}}
+				\]
+				\[
+				\nabla_\mu f_t(\lambda, \mu) \gets \big(C r_t - c_t\big) \cdot \mathds{1}_{\{r_t - \lambda c_t - \mu c_t + \mu C r_t > 0\}}
+				\]
+				\State Update $\lambda_t$ and $\mu_t$ using SGD:
+				\[
+				\lambda_{t+1} \gets \lambda_t - \epsilon_t \cdot \nabla_\lambda f_t(\lambda, \mu)
+				\]
+				\[
+				\mu_{t+1} \gets \mu_t - \epsilon_t \cdot \nabla_\mu f_t(\lambda, \mu)
+				\]
+				\State Compute the bid per impression for the $t$-th auction:
+				\[
+				b_t \gets \frac{1 + \mu_t \cdot C}{\lambda_t + \mu_t} \cdot r_t
+				\]
+				\State Submit $b_t$ for auction $t$
+				\EndFor
+			\end{algorithmic}
+		\end{algorithm}
+	
+	As we discussed in the previous section, in practice, it is more common to implement the batch update algorithm. The batch update of $\lambda$ is quite similar to the formula used in max delivery. The mini-batch gradient is given by:
+	\[
+	\sum_{s \in (t, t+\Delta t)} \nabla_{\lambda} f_s(\lambda, \mu) = \frac{R(t)}{T} \cdot B - S(t),
+	\]
+	where $\Delta t$ is the update time interval, $R(t)$ is the number of observed auction requests, and $S(t)$ is the actual spend during $\Delta t$. As for $\mu$, note that:
+	\[
+	\sum_{s \in (t, t+\Delta t)} r_s \mathds{1}_{\{r_s - \lambda c_s - \mu c_s + \mu C r_s > 0\}}
+	\]
+	is the expected number of conversions (in this case, clicks) during $\Delta t$. If, within $\Delta t$, there are sufficient actual conversions (denoted as $N(t)$), then $N(t)$ is a good approximation of the sum above. Thus:
+	\[
+	\sum_{s \in (t, t+\Delta t)} \nabla_{\mu} f_s(\lambda, \mu) \approx C \cdot N(t) - S(t).
+	\]
+	
+	The mini-batch update rule is then:
+	\begin{equation*}
+		\begin{aligned}
+			\lambda_{t+1} & \gets \lambda_t - \epsilon_t \cdot \left( \frac{R(t)}{T} \cdot B - S(t) \right), \\
+			\mu_{t+1} & \gets \mu_t - \epsilon_t \cdot \left( C \cdot N(t) - S(t) \right),
+		\end{aligned}
+	\end{equation*}
+	where $\epsilon_t$ is the step size.
+	
+	Similar to max delivery, in the mini-batch update, the bid per click remains unchanged within $(t, t + \Delta t)$ and is given by:
+	\[
+	b_{\text{click}, t} = \frac{1 + \mu_t C}{\lambda_t + \mu_t}.
+	\]
+	
+	The bid per impression for any $s \in (t, t+\Delta t)$ is:
+	\[
+	b_s = b_{\text{click}, t} \cdot r_s = \frac{1 + \mu_t C}{\lambda_t + \mu_t} \cdot r_s.
+	\]
+	
+	\begin{algorithm}[H]
+		\caption{Mini-Batch DOGD for Cost Cap Problem}
+		\label{alg:minibatch_dogd_costcap}
+		\begin{algorithmic}[1]
+			\Require $B$: Total budget, $C$: Target cost per click (CPC), $T$: Predicted total number of auction opportunities, $\Delta t$: Mini-batch update interval, $\epsilon_t$: Step size schedule
+			\Ensure Optimal dual variables $\lambda_t$, $\mu_t$, and corresponding bids per impression $b_s$
+			\State Initialize $\lambda_0 \gets \lambda_{\text{init}}, \mu_0 \gets \mu_{\text{init}}$ \Comment{Initial dual variables}
+			\For{$t = 0$ to EndOfDay with step size $\Delta t$} \Comment{Iterate over mini-batches}
+			\State Count the number of auction requests $R(t)$ and observe the actual spend $S(t)$ during interval $(t, t + \Delta t)$
+			\State Count the number of conversions (clicks) $N(t)$ during interval $(t, t + \Delta t)$
+			\State Compute the mini-batch gradients:
+			\[
+			\text{BatchGrad}_{\lambda, t} = \frac{R(t)}{T} \cdot B - S(t)
+			\]
+			\[
+			\text{BatchGrad}_{\mu, t} = C \cdot N(t) - S(t)
+			\]
+			\State Update the dual variables using the mini-batch gradients:
+			\[
+			\lambda_{t+1} \gets \lambda_t - \epsilon_t \cdot \text{BatchGrad}_{\lambda, t}
+			\]
+			\[
+			\mu_{t+1} \gets \mu_t - \epsilon_t \cdot \text{BatchGrad}_{\mu, t}
+			\]
+			\State Compute the bid per click for all auctions in $(t, t + \Delta t)$:
+			\[
+			b_{\text{click}, t} = \frac{1 + \mu_t C}{\lambda_t + \mu_t}
+			\]
+			\State Compute bid per impression $b_s$ for all $s \in (t, t + \Delta t)$ with pCTR $r_s$:
+			\[
+			b_s = b_{\text{click}, t} \cdot r_s = \frac{1 + \mu_t C}{\lambda_t + \mu_t} \cdot r_s
+			\]
+			\EndFor
+		\end{algorithmic}
+	\end{algorithm}
+	
+	
+	Related algorithms can be found in \cite{gao2022bidding}.
+	
+	
+	\subsection*{Practical Considerations}
+	
+	
 	\end{section}
 	
 \end{document}

@@ -123,6 +123,7 @@
 	\end{equation*}
 	where $(\cdot)_{+}$ again is the ReLU function.  The dual problem of ~\eqref{eq:cost_cap} is:
 	\begin{equation}
+		\label{eq:cost_cap_dual}
 		\min_{\lambda \geq 0, \mu \geq 0}  \mathcal{L}^*(\lambda, \mu) = \min_{\lambda \geq 0, \mu \geq 0}  \sum_{t=1}^{T} \left[ (r_t - \lambda c_t - \mu c_t + \mu C r_t)_{+} + \lambda \cdot \frac{B}{T} \right].
 	\end{equation}
 	Suppose we have feasible solution to this problem 
@@ -135,6 +136,7 @@
 	\end{equation*}
 	The optimal bid per click is given by 
 	\begin{equation}
+		\label{eq:cost_cap_bid_formula}
 		b^*_{click} = \frac{1}{\lambda^* + \mu^*} + \frac{\mu^*}{\lambda^* + \mu^*} \cdot C =  \frac{\lambda^*}{\lambda^* + \mu^*} \cdot \frac{1}{\lambda^*}+ \frac{\mu^*}{\lambda^* + \mu^*} \cdot C
 	\end{equation}
     Setting $\alpha = \lambda^*/(\lambda^* + \mu^*)$, we have 
